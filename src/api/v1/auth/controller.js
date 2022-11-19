@@ -6,6 +6,28 @@ import Mapper from '../../../frameworks/database/mapper/index.js';
 
 class AuthController extends BaseController {
     async handleLogin(req, res) {
+        try {
+            const {
+                username,
+                password,
+            } = req.body;
+
+            const credentials = await this.service.login({ username, password });
+
+            return Response.success({ res, data: credentials });
+        } catch (error) {
+            logger.log(error);
+
+            if (error.message === ErrorMessage.PasswordIsInvalid.key) {
+                return Response.error({
+                    res,
+                    code: ErrorMessage.PasswordIsInvalid.code,
+                    message: ErrorMessage.PasswordIsInvalid.message,
+                });
+            }
+
+            throw error;
+        }
     }
 
     async handleRegister(req, res) {
