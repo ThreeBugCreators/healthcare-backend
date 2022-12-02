@@ -31,6 +31,9 @@ class AuthController extends BaseController {
     }
 
     async handleRegister(req, res) {
+        const userCreated = await this.service.register(req.body);
+
+        return Response.success({ res, data: Mapper.toUserDomain(userCreated) });
     }
 
     async refreshAccessToken(req, res) {
