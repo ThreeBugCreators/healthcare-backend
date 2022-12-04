@@ -9,11 +9,19 @@ import Response from '../../common/utils/http-response.js';
 // Route
 import authRouting from '../../api/v1/auth/api.js';
 
-export function configureRouting(app, redisClient) {
+export function bootstrapApi({
+    app,
+    redisUtil: redisClient,
+    databaseConnection,
+    socket: socketConnection,
+}) {
+
+    MongooseRepositoriesContainer.init()
+
     const {
         userRepository,
         tokenRepository,
-    } = MongooseRepositoriesContainer.init().get();
+    } = MongooseRepositoriesContainer.get();
 
     const authRouter = authRouting({
         express,
