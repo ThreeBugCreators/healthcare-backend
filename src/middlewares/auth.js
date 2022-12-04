@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 
-import JwtHelper from '../common/utils/jwt';
-import Response from '../common/utils/http-response';
+import JwtHelper from '../common/utils/jwt.js';
+import Response from '../common/utils/http-response.js';
 
 class AuthMiddleware {
     async interceptToken(req, res, next) {
