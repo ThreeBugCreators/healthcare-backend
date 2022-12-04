@@ -1,0 +1,18 @@
+name: github-actions
+run-name: ${{ github.actor }} is using Github Actions
+on:
+  push:
+    branches:
+      - dev
+    
+jobs:  
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v1
+        - name: 'Install Node'
+          run: curl -s https://deb.nodesource.com/setup_16.x | sudo bash && sudo apt install nodejs -y
+        - name: Install dependencies
+          run: npm install 
+        - name: "Run Lint"
+          run: npm run lint
