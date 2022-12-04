@@ -8,19 +8,19 @@ import MongooseRepositoriesContainer from '../database/repositories/index.js';
 import Response from '../../common/utils/http-response.js';
 // Route
 import authRouting from '../../api/v1/auth/api.js';
+import doctorRouting from '../../api/v1/doctors/api.js';
 
 export function bootstrapApi({
     app,
-    redisUtil: redisClient,
     databaseConnection,
-    socket: socketConnection,
+    redisUtil: redisClient,
 }) {
-
-    MongooseRepositoriesContainer.init()
+    MongooseRepositoriesContainer.init();
 
     const {
         userRepository,
         tokenRepository,
+        doctorInfoRepository,
     } = MongooseRepositoriesContainer.get();
 
     const authRouter = authRouting({
@@ -30,9 +30,18 @@ export function bootstrapApi({
         tokenRepository,
     });
 
+    const doctorRouter = doctorRouting({
+        express,
+        redisClient,
+        userRepository,
+        doctorInfoRepository,
+        databaseConnection,
+    });
+
     const apiRoute = express.Router();
 
     apiRoute.use('/auth', authRouter);
+    apiRoute.use('/doctors', doctorRouter);
 
     apiRoute.use((error, _req, res, _next) => {
         logger.error(error);
