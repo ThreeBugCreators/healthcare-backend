@@ -2,16 +2,15 @@ import './load-env.js';
 import http from 'http';
 import { Server } from 'socket.io';
 import logger from './common/logging/index.js';
-import { redisConnection, promisify } from './frameworks/redis/index.js';
-import { redisConfiguration, mongoDbConfiguration } from './configs/index.js';
+import { setupRedis } from './frameworks/redis/index.js';
 import {
-    mongooseConnection,
+    setupMongoDB,
+    databaseConnection,
 } from './frameworks/database/index.js';
 import {
     app,
-    configureRouting,
+    bootstrapApi,
 } from './frameworks/http-server/index.js';
-import integrateSocket from './frameworks/http-server/socket-io/io.js';
 
 const server = http.createServer(app);
 
@@ -22,12 +21,10 @@ const server = http.createServer(app);
             process.exit(1);
         });
 
-        const [redisClient] = await Promise.all([
-            redisConnection.createRedisClient(redisConfiguration),
-            mongooseConnection(mongoDbConfiguration.connectionString).connect(),
+        const [redisUtil] = await Promise.all([
+            setupRedis(),
+            setupMongoDB(),
         ]);
-
-        await redisClient.connect();
 
         const socket = new Server(server, {
             cors: {
@@ -35,12 +32,9 @@ const server = http.createServer(app);
             },
         });
 
-        const redisUtil = promisify(redisClient);
+        bootstrapApi({ app, redisUtil, databaseConnection, socket });
 
-        configureRouting(app, redisUtil);
-        integrateSocket(socket, redisUtil);
-
-        server.listen(6969, () => logger.info('Server is listen on PORT 6969'));
+        server.listen(process.env.PORT || 6969, () => logger.info('Server is listen on PORT 6969'));
     } catch (error) {
         console.error(error);
         process.exit(1);
