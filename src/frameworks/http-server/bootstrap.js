@@ -6,31 +6,58 @@ import { ValidationError } from 'express-validation';
 import logger from '../../common/logging/index.js';
 import MongooseRepositoriesContainer from '../database/repositories/index.js';
 import Response from '../../common/utils/http-response.js';
-// Route
-import authRouting from '../../api/v1/auth/api.js';
-import doctorRouting from '../../api/v1/doctors/api.js';
+// Import route
+import * as apiEntry from '../../api/v1/entry.js';
+// Import socket wrapup
+import integrateSocket from './socket-io/io.js';
 
 export function bootstrapApi({
     app,
-    databaseConnection,
     redisUtil: redisClient,
+    databaseConnection,
+    socket: socketConnection,
 }) {
-    MongooseRepositoriesContainer.init();
-
     const {
         userRepository,
         tokenRepository,
         doctorInfoRepository,
-    } = MongooseRepositoriesContainer.get();
+        roomRepository,
+        messageRepository,
+        surveyRepository,
+        appointmentRepository,
+    } = MongooseRepositoriesContainer.init().get();
 
-    const authRouter = authRouting({
+    if (socketConnection) {
+        setupSocket(socketConnection, {
+            userRepository,
+            roomRepository,
+            messageRepository,
+            redisClient,
+        });
+    }
+
+    const userRouter = apiEntry.userRouting({
+        express,
+        redisClient,
+        repository: userRepository,
+    });
+
+    const messageRouter = apiEntry.messageRouting({
+        express,
+        redisClient,
+        messageRepository,
+        userRepository,
+        roomRepository,
+    });
+
+    const authRouter = apiEntry.authRouting({
         express,
         redisClient,
         userRepository,
         tokenRepository,
     });
 
-    const doctorRouter = doctorRouting({
+    const doctorRouter = apiEntry.doctorRouting({
         express,
         redisClient,
         userRepository,
@@ -38,10 +65,39 @@ export function bootstrapApi({
         databaseConnection,
     });
 
+    const roomRouter = apiEntry.roomRouting({
+        express,
+        redisClient,
+        userRepository,
+        roomRepository,
+        doctorInfoRepository,
+    });
+
+    const surveyRouter = apiEntry.surveyRouting({
+        express,
+        redisClient,
+        surveyRepository,
+        doctorInfoRepository,
+        userRepository,
+    });
+
+    const appointmentRouter = apiEntry.appointmentRouting({
+        express,
+        redisClient,
+        userRepository,
+        doctorInfoRepository,
+        appointmentRepository,
+    });
+
     const apiRoute = express.Router();
 
+    apiRoute.use('/users', userRouter);
     apiRoute.use('/auth', authRouter);
     apiRoute.use('/doctors', doctorRouter);
+    apiRoute.use('/rooms', roomRouter);
+    apiRoute.use('/messages', messageRouter);
+    apiRoute.use('/surveys', surveyRouter);
+    apiRoute.use('/appointments', appointmentRouter);
 
     apiRoute.use((error, _req, res, _next) => {
         logger.error(error);
@@ -56,3 +112,6 @@ export function bootstrapApi({
     app.use('/api/v1', apiRoute);
 }
 
+function setupSocket(socket, services) {
+    integrateSocket(socket, services);
+}

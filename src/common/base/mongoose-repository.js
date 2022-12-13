@@ -25,6 +25,10 @@ class BaseMongooseRepository extends BaseRepository {
         return this.model.create(data);
     }
 
+    createWithSession(data, session) {
+        return this.model.create(data, { session });
+    }
+
     findOne(options) {
         const optimizedOptions = Object.assign(findOperationBaseOptions, options);
         return this.model
@@ -99,6 +103,10 @@ class BaseMongooseRepository extends BaseRepository {
                     isActive: ActiveStatus.Inactive,
                 },
             );
+    }
+
+    cleanedDelete(data) {
+        return this.model.deleteOne(data.where);
     }
 }
 

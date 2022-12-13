@@ -1,7 +1,11 @@
 import axios from 'axios';
-import { Roles } from '../../../common/constants/index.js';
+import _ from 'lodash';
 import logger from '../../../common/logging/index.js';
 import Hasher from '../../../common/utils/password-hashing.js';
+import {
+    Roles,
+    DiasesMapper,
+} from '../../../common/constants/index.js';
 
 class DoctorService {
     constructor({
@@ -80,6 +84,8 @@ class DoctorService {
             },
         });
 
+        console.log({ doctor, doctorId });
+
         return doctor;
     }
 
@@ -105,21 +111,58 @@ class DoctorService {
         return doctors;
     }
 
-    async getDoctorsBySymptoms({ symptoms }) {
-        const url = `${process.env.MODEL_SERVER}/api/v1/predictions${(new URLSearchParams(symptoms)).toString()}`;
-        const result = await axios.get(url, {
+    async getDoctorsBySymptoms({ symptoms, address }) {
+        const url = `${process.env.MODEL_SERVER}/api/v1/predictions?${(new URLSearchParams({symptoms})).toString()}`;
+        const { data } = await axios.get(url, {
             headers: {
                 authorization: `${process.env.SERVER_API_KEY}`,
                 'content-type': 'application/json',
             },
         });
 
-        const {
-            disases,
-            bodyParts,
-        } = result;
+        const diseases = data && data.data;
+        const bodyParts = [];
+        const diseasesData = [];
 
-        return { disases, bodyParts };
+        diseases.forEach((disease, index) => {
+            bodyParts.push(DiasesMapper[disease]);
+
+            if (index >= 3) {
+                return;
+            }
+
+            diseasesData.push({
+                disease,
+                bodyParts: DiasesMapper[disease],
+            });
+        });
+
+        const matchDoctors = await this.findMatchingDoctor({ bodyParts: _.uniq(bodyParts), address });
+
+        return { diseasesData, doctor: matchDoctors };
+    }
+
+    async findMatchingDoctor({
+        _address,
+        bodyParts,
+    }) {
+        // Unused const nearbyAddress = this.generateNearbyHospital({ address });
+
+        console.log({ bodyParts });
+
+        const doctors = await this.doctorInfoRepository.find({
+            where: {
+                department: {
+                    $in: _.uniq(_.flatten(bodyParts)),
+                },
+            },
+        });
+
+        return doctors;
+    }
+
+    generateNearbyHospital() {
+
     }
 }
 

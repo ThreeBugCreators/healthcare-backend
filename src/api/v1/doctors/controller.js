@@ -18,7 +18,11 @@ class DoctorController extends BaseController {
         if (symptoms) {
             const symptomData = symptoms.split(',');
             if (symptomData.length > 0) {
-                console.log(symptomData);
+                const doctors = await this.service.getDoctorsBySymptoms({
+                    symptoms: symptomData,
+                });
+
+                return Response.success({ res, data: doctors });
             }
         }
 
