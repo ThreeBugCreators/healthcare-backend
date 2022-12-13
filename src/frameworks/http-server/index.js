@@ -1,4 +1,4 @@
 import app from './app.js';
-import { configureRouting } from './route.js';
+import { bootstrapApi } from './bootstrap.js';
 
-export { app, configureRouting };
+export { app, bootstrapApi };
