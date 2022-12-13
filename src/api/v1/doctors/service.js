@@ -84,8 +84,6 @@ class DoctorService {
             },
         });
 
-        console.log({ doctor, doctorId });
-
         return doctor;
     }
 

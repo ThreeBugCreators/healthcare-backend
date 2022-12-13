@@ -1,3 +1,6 @@
 import path from 'path';
 import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve(process.cwd(), '.local.env') });
+
+if (process.env.ENV === 'dev') {
+    dotenv.config({ path: path.resolve(process.cwd(), '.local.env') });
+}
