@@ -5,13 +5,25 @@ const init = client => {
             .catch(err => [err, undefined]);
 
     return {
-        getClient: () => client,
+        getClient() {
+            return client;
+        },
 
-        multi: () => client.multi(),
+        multi() {
+            return client.multi();
+        },
 
-        getFromRedis: key => performOperation(client.get(key)),
+        getFromRedis(key) {
+            return performOperation(client.get(key));
+        },
 
-        setToRedis: (key, value) => performOperation(client.set(key, value)),
+        deleteKey(key) {
+            return performOperation(client.del(key));
+        },
+
+        setToRedis(key, value) {
+            return performOperation(client.set(key, value));
+        },
 
         setExpireToRedis(key, value, ttl) {
             if (typeof value === 'object') {
@@ -31,7 +43,21 @@ const init = client => {
             return performOperation(client.hmGet(key, field));
         },
 
-        hGetAllFromRedis: key => performOperation(client.hGetAll(key)),
+        hGetAllFromRedis(key) {
+            return performOperation(client.hGetAll(key));
+        },
+
+        addToSet(key, value) {
+            return performOperation(client.sAdd(key, value));
+        },
+
+        getFromSet(key) {
+            return performOperation(client.sMembers(key));
+        },
+
+        removeItemFromSet(key, item) {
+            return performOperation(client.sRem(key, item));
+        },
     };
 };
 

@@ -23,6 +23,8 @@ class AuthMiddleware {
 
         req.user = isAccessTokenAlive;
 
+        console.log(req.user);
+
         return next();
     }
 }

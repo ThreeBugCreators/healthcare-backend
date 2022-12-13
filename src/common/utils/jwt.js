@@ -60,13 +60,14 @@ class JwtHelper {
             const expiredAt = new Date(exp * 1000);
             const now = moment.utc().toDate();
 
-            if (expiredAt <= now) {
-                return null;
-            }
+            console.log({
+                expiredAt,
+                now,
+            });
 
             return jwtData;
         } catch (error) {
-            logger.log(error);
+            logger.error(error);
             return null;
         }
     }

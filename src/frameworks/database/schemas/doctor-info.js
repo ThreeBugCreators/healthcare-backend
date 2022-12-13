@@ -26,6 +26,15 @@ const DoctorInfoSchema = new Schema({
     avatar: {
         type: String,
     },
+    hospital: {
+        type: String,
+    },
+    city: {
+        type: String,
+    },
+    department: {
+        type: String,
+    },
 }, {
     collection: 'doctor-info',
     timestamps: true,
