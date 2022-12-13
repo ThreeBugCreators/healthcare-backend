@@ -12,9 +12,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/public', express.static(path.join(process.cwd(), 'public')));
 app.use(cors({
-    origin: [
-        'http://localhost:4200',
-    ],
+    origin: '*',
 }));
 
 export default app;
