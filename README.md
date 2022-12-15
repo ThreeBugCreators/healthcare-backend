@@ -27,7 +27,7 @@ Healthcare uses a number of open source projects to work properly:
 
 - [Angular] - HTML enhanced for web apps!
 - [Flask] - Simple http server for python
-- [Tensorflow] - Build an AI model
+- [Scikit-learn] - Build an AI model
 - [Primeng] - UI Toolkit
 - [node.js] - evented I/O for the backend
 - [Express] - fast node.js network app framework [@tjholowaychuk]
