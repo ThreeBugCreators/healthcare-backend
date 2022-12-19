@@ -67,7 +67,6 @@ class AuthService {
             email,
             password,
             name,
-            surname,
         } = data;
 
         const existedUser = await this.userRepository.findOne({ where: { username } });
@@ -77,7 +76,7 @@ class AuthService {
             throw new Error(`User with ${username} existed`);
         }
 
-        return await this.userRepository.create({ username, email, name, surname, password: hashedPassword });
+        return await this.userRepository.create({ username, email, name, password: hashedPassword });
     }
 
     async refreshAccessToken({ refreshToken, accessToken }) {

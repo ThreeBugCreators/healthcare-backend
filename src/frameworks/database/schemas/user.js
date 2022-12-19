@@ -1,16 +1,10 @@
 import mongooseUniqueValidator from 'mongoose-unique-validator';
 import mongoose from 'mongoose';
 
-import { Roles } from '../../../common/constants/index.js';
-
 const { Schema, model } = mongoose;
 
 const UserSchema = new Schema({
     name: {
-        type: String,
-        required: true,
-    },
-    surname: {
         type: String,
         required: true,
     },
@@ -28,17 +22,12 @@ const UserSchema = new Schema({
         required: true,
         unique: true,
     },
-    role: {
-        type: String,
-        default: Roles.User,
-        enum: Object.values(Roles),
-    },
-    created: Date,
+}, {
+    collection: 'users',
+    timestamps: true,
 });
 
 UserSchema.index({ name: 1 });
-
-UserSchema.index({ name: 1, created: -1 });
 
 UserSchema.plugin(mongooseUniqueValidator);
 

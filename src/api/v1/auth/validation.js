@@ -6,7 +6,6 @@ export const registerValidationSchema = {
         password: Joi.string().required().min(5),
         email: Joi.string().email().required(),
         name: Joi.string().required(),
-        surname: Joi.string(),
     }),
 };
 
